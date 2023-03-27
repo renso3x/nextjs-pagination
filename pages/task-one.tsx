@@ -1,7 +1,8 @@
+import React from "react";
 import Link from "next/link";
 import { type FormEventHandler } from "react";
 
-import styles from "../styles/Task.module.css";
+import styles from "../styles/Home.module.css";
 
 interface PageTemplateProps {
   title: string;
@@ -32,41 +33,63 @@ export function PageTemplate({ title, children, onSubmit }: PageTemplateProps) {
 interface ToggleButtonProps {
   children: React.ReactNode;
 }
+export function ToggleButton({
+  children,
+  selected,
+  onClick,
+}: {
+  children: React.ReactNode;
+  selected: boolean;
+  onClick: () => void;
+}) {
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    onClick();
+  };
 
-// TODO: update this React component, you may change function signature
-export function ToggleButton({ children }: ToggleButtonProps) {
-  /**
-   * Requirement:
-   * - when clicking an unselected button, it will show a selected style "toggle-button-selected"
-   * - when clicking a selected button, it should cancel the selection and no buttons are selected
-   * - reuse the same button for task-two
-   */
-  return <button className={styles["toggle-button"]}>{children}</button>;
+  const className = selected
+    ? styles["toggle-button-selected"]
+    : styles["toggle-button"];
+
+  return (
+    <button className={className} onClick={handleClick}>
+      {children}
+    </button>
+  );
 }
 
-// TODO: update this React component
 export default function TaskOne() {
+  const [selectedButton, setSelectedButton] = React.useState<number | null>(
+    null
+  );
+
+  const handleButtonClick = (buttonNumber: number) => {
+    if (selectedButton === buttonNumber) {
+      setSelectedButton(null);
+    } else {
+      setSelectedButton(buttonNumber);
+    }
+  };
+
   const handleSubmit = () => {
-    /**
-     * Requirement:
-     * - if a button is selected, show alert "You are currently selecting button x"
-     * - if no buttons are selected, show alert "Please select a button"
-     * - there could only be one selected button at a time
-     */
+    if (selectedButton === null) {
+      alert("Please select a button");
+    } else {
+      alert(`You are currently selecting button ${selectedButton}`);
+    }
   };
 
   return (
-    <PageTemplate title="Task 1">
-      <ToggleButton>{0}</ToggleButton>
-      <ToggleButton>{1}</ToggleButton>
-      <ToggleButton>{2}</ToggleButton>
-      <ToggleButton>{3}</ToggleButton>
-      <ToggleButton>{4}</ToggleButton>
-      <ToggleButton>{5}</ToggleButton>
-      <ToggleButton>{6}</ToggleButton>
-      <ToggleButton>{7}</ToggleButton>
-      <ToggleButton>{8}</ToggleButton>
-      <ToggleButton>{9}</ToggleButton>
+    <PageTemplate title="Task 1" onSubmit={handleSubmit}>
+      {Array.from({ length: 10 }).map((_, index) => (
+        <ToggleButton
+          key={index}
+          selected={selectedButton === index}
+          onClick={() => handleButtonClick(index)}
+        >
+          {index}
+        </ToggleButton>
+      ))}
     </PageTemplate>
   );
 }
